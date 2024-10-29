@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: conversao-temperatura
+  name: teste-cicd
 spec:
   selector:
     matchLabels:
-      app: conversao-temperatura
+      app: teste-cicd
   template:
     metadata:
       labels:
-        app: conversao-temperatura
+        app: teste-cicd
     spec:
       containers:
-        - name: conversao-temperatura
-          image: fabricioveronez/conversao-temperatura-fc
+        - name: teste-cicd
+          image: dsahara/teste-cicd
           ports:
             - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: conversao-temperatura
+  name: teste-cicd
 spec:
   selector:
-    app: conversao-temperatura
+    app: teste-cicd
   ports:
     - port: 80
       targetPort: 8080
