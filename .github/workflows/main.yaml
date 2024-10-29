@@ -5,6 +5,15 @@ on:
       - develop
       - release
       - main
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: autopilot-cluster-1    # cluster name
+  GKE_ZONE: us-central1   # cluster zone
+  IMAGE: micro # image name
+  IMAGE_TAG: test # image tag
+  GAR_ZONE: europe-central2 # artifact registry zone
+  GAR_REPO: obiwan # artifact registry repository
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -48,12 +57,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.7
 
-      - uses: azure/k8s-set-context@v4
+      # Setup gcloud CLI
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
         with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.K8S_CONFIG }}
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
 
-      - uses: Azure/k8s-deploy@v5
+      - name: Docker configuration
+        run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://$GAR_ZONE-docker.pkg.dev
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v0
         with:
-          manifests: ./k8s/deployment.yaml
-          images: dsahara/teste-cicd
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
