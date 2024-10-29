@@ -72,3 +72,9 @@ jobs:
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
+
+      - name: GET
+        run: kubectl get pods
+
+      - name: Deploy
+        run: kubectl apply -f ./k8s/deployment.yaml
