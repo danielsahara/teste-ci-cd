@@ -41,3 +41,19 @@ jobs:
         with:
           push: true
           tags: dsahara/teste-cicd:latest
+  cd:
+    runs-on: ubuntu-latest
+    needs: [ci]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_CONFIG }}
+
+      - uses: Azure/k8s-deploy@v5
+        with:
+          manifests: ./k8s/deployment.yaml
+          images: dsahara/teste-cicd
